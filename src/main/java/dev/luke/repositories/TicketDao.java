@@ -9,11 +9,13 @@ public interface TicketDao {
 
     User addNewUser(User user);
 
-    User getAllUsers(String email);
+    User getUserByEmail(String email);
 
     Ticket addNewTicket(Ticket ticket);
 
-    List<Ticket> getTicketsByStatus(String status, User user);
+    List<Ticket> getPendingTickets();
+
+    List<Ticket> getAllTicketsForUser(User user);
 
     Ticket saveTicket(Ticket ticket);
 }

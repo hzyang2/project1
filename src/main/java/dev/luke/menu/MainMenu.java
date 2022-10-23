@@ -3,7 +3,6 @@ package dev.luke.menu;
 import dev.luke.entities.Ticket;
 import dev.luke.entities.User;
 import dev.luke.repositories.TicketDao;
-
 import java.util.List;
 import java.util.Scanner;
 
@@ -37,10 +36,10 @@ public class MainMenu {
         email = this.scan.next();
         System.out.println("Please enter password: ");
         password = this.scan.next();
-        User user = this.ticketDao.getAllUsers(email);
+        User user = this.ticketDao.getUserByEmail(email);
         if (user == null || user.getPassword().equals(password) == false) {
             System.out.println("invalid credentials");
-            user.isAuthenticated = false;
+            return new User();
         }
         user.isAuthenticated = true;
         return user;
@@ -48,11 +47,14 @@ public class MainMenu {
 
     public void viewTickets(int selection, Menu menu, User user) {
         String statusFilter = menu.getMenuCode(selection - 1); //ArrayList is index-0.
-        System.out.println("View " + statusFilter + " tickets.");
-        List<Ticket> tickets = this.ticketDao.getTicketsByStatus(statusFilter, user);
+        System.out.println(statusFilter + " tickets:");
+        List<Ticket> tickets = this.ticketDao.getAllTicketsForUser(user);
         for (Ticket tkt : tickets) {
-            if (statusFilter == "all" || statusFilter == tkt.getStatus())
+            if (statusFilter.equals("all") || statusFilter.equals(tkt.getStatus()))
                 System.out.println(tkt.showUser());
+        }
+        if (tickets.size() == 0) {
+            System.out.println("(no tickets found)");
         }
     }
 

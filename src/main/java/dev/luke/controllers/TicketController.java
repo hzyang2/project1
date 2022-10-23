@@ -19,22 +19,12 @@ public class TicketController {
         ctx.result(userJason);
     };
 
-    public Handler getAllUsers = (ctx) ->{
+    public Handler getUserByEmail = (ctx) ->{
         String JSON = ctx.body();
         Gson gson = new Gson();
         User user = gson.fromJson(JSON, User.class);
-        User updateUser = Driver.ticketService.getAllUsers(user.getEmail());
+        User updateUser = Driver.ticketService.getUserByEmail(user.getEmail());
         String json = gson.toJson(updateUser);
-        ctx.result(json);
-    };
-
-    public Handler getTicketsByStatus = (ctx) ->{
-        int id = Integer.parseInt(ctx.pathParam("id"));//This will take what value was in the {id} and turn it into an int for us to use
-        String status = "";
-        User user = null;
-        List<Ticket> ticket = Driver.ticketService.getTicketsByStatus(status, user);
-        Gson gson = new Gson();
-        String json = gson.toJson(ticket);
         ctx.result(json);
     };
 
@@ -47,4 +37,34 @@ public class TicketController {
         ctx.status(201); //This is a status code that will tell us how things went
         ctx.result(ticketJson);
     };
+    public Handler getPendingTickets = (ctx) ->{
+        String JSON = ctx.body();
+        Gson gson = new Gson();
+        User user = gson.fromJson(JSON, User.class);
+        Ticket ticket = gson.fromJson(JSON, Ticket.class);
+        List<Ticket> getTicket = Driver.ticketService.getTicketsByStatus(ticket.getStatus(), user);
+        String json = gson.toJson(getTicket);
+        ctx.result(json);
+    };
+
+    public Handler getAllTicketsForUser = (ctx) ->{
+        String JSON = ctx.body();
+        Gson gson = new Gson();
+        User user = gson.fromJson(JSON, User.class);
+        Ticket ticket = gson.fromJson(JSON, Ticket.class);
+        List<Ticket> getTicket = Driver.ticketService.getTicketsByStatus(ticket.getStatus(), user);
+        String json = gson.toJson(getTicket);
+        ctx.result(json);
+    };
+
+    public Handler saveTicket = (ctx) ->{
+        int id = Integer.parseInt(ctx.pathParam("id"));//This will take what value was in the {id} and turn it into an int for us to use
+        String status = "";
+        User user = null;
+        List<Ticket> ticket = Driver.ticketService.getTicketsByStatus(status, user);
+        Gson gson = new Gson();
+        String json = gson.toJson(ticket);
+        ctx.result(json);
+    };
+
 }

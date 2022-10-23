@@ -5,13 +5,13 @@ import dev.luke.entities.User;
 import dev.luke.menu.MainMenu;
 import dev.luke.menu.Menu;
 import dev.luke.repositories.TicketDao;
-import dev.luke.repositories.TicketDaoImpl;
+import dev.luke.repositories.TicketDaoPostgres;
 
 import java.util.List;
 import java.util.Scanner;
 
 public class MenuDriver {
-    TicketDao ticketDao = new TicketDaoImpl();
+    TicketDao ticketDao = new TicketDaoPostgres();
     MainMenu mainMenu = new MainMenu(ticketDao);
     Scanner scan = new Scanner(System.in);
 
@@ -41,8 +41,7 @@ public class MenuDriver {
     }
 
     private User serveEmployee(User user) {
-        System.out.println("Select a number which you want.");
-        Menu menu = new Menu("Employee Logged In", "Welcome to Employee Logged In");
+        Menu menu = new Menu("Employee", "Employee options");
         menu.add(1, "View all tickets", "all");
         menu.add(2, "View Pending tickets", "Pending");
         menu.add(3, "View Approved tickets", "Approved");
@@ -69,10 +68,9 @@ public class MenuDriver {
         return user;
     }
 
-    private User serveManager(User user){
-        System.out.println("Select a number which you want.");
-        Menu menu = new Menu("Manager View", "Manager View of Pending Tickets");
-        List<Ticket> tickets = ticketDao.getTicketsByStatus("Pending", user);
+    private User serveManager(User user) {
+        Menu menu = new Menu("Manager", "Manager options");
+        List<Ticket> tickets = ticketDao.getPendingTickets();
         Boolean somePending = (tickets != null && tickets.size() > 0);
         Ticket lastTicket = new Ticket();
         if (somePending) {
@@ -116,10 +114,10 @@ public class MenuDriver {
             if (!user.isAuthenticated) {
                 user = registerOrLogin(user);
             }
-            if (user.isAuthenticated && user.getRole() == "Employee") {
+            if (user.isAuthenticated && user.getRole().equals("Employee")) {
                 user = serveEmployee(user);
             }
-            if (user.isAuthenticated && user.getRole() == "Manager") {
+            if (user.isAuthenticated && user.getRole().equals("Manager")) {
                 user = serveManager(user);
             }
         }

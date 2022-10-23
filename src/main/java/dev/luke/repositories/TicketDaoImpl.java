@@ -2,7 +2,6 @@ package dev.luke.repositories;
 
 import dev.luke.entities.Ticket;
 import dev.luke.entities.User;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +22,7 @@ public class TicketDaoImpl implements TicketDao{
     }
 
     @Override
-    public User getAllUsers(String email) {
+    public User getUserByEmail(String email) {
         return userTable.get(email);
     }
 
@@ -36,24 +35,24 @@ public class TicketDaoImpl implements TicketDao{
     }
 
     /**
-     * If the user is a manager, then show tickets from all users.
-     * If the user is an employee, then only show user's tickets.
-     *
-     * If statusFilter is passed as "Pending", "Approved", or "Rejected",
-     * then filter accordingly.
-     * but if  statusFilter is passed as "all", include all tickets
-     * regardless of status.
+     * For manager view, show Pending tickets from all users.
      */
     @Override
-    public List<Ticket> getTicketsByStatus(String statusFilter, User user) {
+    public List<Ticket> getPendingTickets() {
         List<Ticket> tickets = new ArrayList<>();
         ticketTable.forEach((k, tkt)-> {
-            if ( //filter by status:
-                    (tkt.getStatus() == statusFilter //If statusFilter is passed as "Pending", "Approved", or "Rejected",
-                            || statusFilter == "all") // but if  statusFilter is passed as "all", include all tickets
-                            && //filter by user access (role or id):
-                            (user.getRole() == "Manager" ||
-                                    user.getUser_id() == tkt.getUser().getUser_id())) {
+            if (tkt.getStatus().equals("Pending")) {
+                tickets.add(tkt);
+            }
+        });
+        return tickets;
+    }
+
+    @Override
+    public List<Ticket> getAllTicketsForUser(User user) {
+        List<Ticket> tickets = new ArrayList<>();
+        ticketTable.forEach((k, tkt)-> {
+            if (user.getUser_id() == tkt.getUser().getUser_id()) {
                 tickets.add(tkt);
             }
         });

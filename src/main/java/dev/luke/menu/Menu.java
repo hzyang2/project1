@@ -19,11 +19,10 @@ public class Menu {
 
     @Override
     public String toString() {
-        String returnString = initialPrompt + "\n";
+        String returnString = initialPrompt;
         for (MenuItem menuitem : menuItemList) {
-            returnString += menuitem + "\n";
+            returnString += "\n" + menuitem;
         }
-        returnString += "Please enter the number: ";
         return returnString;
     }
 
