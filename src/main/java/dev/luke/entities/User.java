@@ -4,7 +4,7 @@ public class User {
     private Integer user_id;
     private String email;
     private String password;
-    private String role = "employee";
+    private String role = "Employee";
 
     public Boolean isAuthenticated = false;
 

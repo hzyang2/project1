@@ -88,7 +88,7 @@ public class MenuDriver {
                 case 2:
                     String statusToSet = menu.getMenuCode(selection - 1); //ArrayList is index-0.
                     lastTicket.setStatus(statusToSet);
-                    ticketDao.saveTicket(lastTicket);
+                    ticketDao.updateTicketStatus(lastTicket);
                     break;
                 case 3:
                     user.isAuthenticated = false;

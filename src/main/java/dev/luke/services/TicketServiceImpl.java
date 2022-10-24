@@ -3,7 +3,6 @@ package dev.luke.services;
 import dev.luke.entities.Ticket;
 import dev.luke.entities.User;
 import dev.luke.repositories.TicketDao;
-
 import java.util.List;
 
 public class TicketServiceImpl implements TicketService{
@@ -15,25 +14,31 @@ public class TicketServiceImpl implements TicketService{
 
     @Override
     public User addNewUser(User user) {
-        return null;
+        return ticketDao.addNewUser(user);
     }
 
     @Override
-    public User getAllUsers(String email) {
-        return null;
+    public User getUserByEmail(String email) {
+        return ticketDao.getUserByEmail(email);
     }
 
     @Override
-    public List<Ticket> getTicketsByStatus(String status, User user) {
-        return null;
+    public List<Ticket> getPendingTickets() {
+        return ticketDao.getPendingTickets();
     }
 
     @Override
     public Ticket addNewTicket(Ticket ticket) {
-        return null;
+        return ticketDao.addNewTicket(ticket);
     }
 
     @Override
-    public void saveTicket(Ticket ticket) {
+    public List<Ticket> getAllTicketsForUser(int user_id) {
+        return ticketDao.getAllTicketsForUser(user_id);
+    }
+
+    @Override
+    public void updateTicketStatus(Ticket ticket) {
+        ticketDao.updateTicketStatus(ticket);
     }
 }

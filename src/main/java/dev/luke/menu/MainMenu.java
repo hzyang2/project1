@@ -48,7 +48,7 @@ public class MainMenu {
     public void viewTickets(int selection, Menu menu, User user) {
         String statusFilter = menu.getMenuCode(selection - 1); //ArrayList is index-0.
         System.out.println(statusFilter + " tickets:");
-        List<Ticket> tickets = this.ticketDao.getAllTicketsForUser(user);
+        List<Ticket> tickets = this.ticketDao.getAllTicketsForUser(user.getUser_id());
         for (Ticket tkt : tickets) {
             if (statusFilter.equals("all") || statusFilter.equals(tkt.getStatus()))
                 System.out.println(tkt.showUser());

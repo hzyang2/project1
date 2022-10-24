@@ -9,12 +9,10 @@ public interface TicketService {
 
     User addNewUser(User user);
 
-    User getAllUsers(String email);
-
-    List<Ticket> getTicketsByStatus(String status, User user);
+    User getUserByEmail(String email);
 
     Ticket addNewTicket(Ticket ticket);
-
-    void saveTicket(Ticket ticket);
-
+    List<Ticket> getAllTicketsForUser(int user_id);
+    List<Ticket> getPendingTickets();
+    void updateTicketStatus(Ticket ticket);
 }

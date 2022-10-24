@@ -20,18 +20,24 @@ public class Driver {
 //        DeleteBookHandler deleteBookHandler = new DeleteBookHandler();
 
         app.get("/hello", helloHandler);
-//        app.get("/books/{id}", ticketController.getBookByIdHandler);
-//        app.post("/books", ticketController.createBook);
-//        app.put("/books", ticketController.updateBookHandler);
-//        app.delete("/books/{id}", ticketController.deleteBookHandler);
-//        app.get("/books/{id}", ticketController.addNewTicket);
+        app.put("/user", ticketController.addNewUser);
+        app.put("/ticket", ticketController.addNewTicket);
+        //How do we pass an email of "aa@bb.com" in this URL??
+        //http://localhost:8080/user/{email} -- where do we pass "aa@bb.com"?
+        //http://localhost:8080/user/aa@bb.com
+        app.get("/user/{email}", ticketController.getUserByEmail);
+        app.get("/pendingTickets", ticketController.getPendingTickets);
+        //We know how to pass an integer id in a path: /books/{id}
+        //We know how to pass an email string: /user/{email}
+        //How do we pass a complete User object in a path??
+        //Answer: I don't know.
+        //Practical answer: don't try; instead pass
+        app.get("/allTicketsByUserId/{userId}", ticketController.getAllTicketsForUser);
+        app.patch("/updateTicketStatus", ticketController.updateTicketStatus);
 
-
+        app.start();
 
 //        MenuDriver driver = new MenuDriver();
 //        driver.runMain();
-        app.start();
     }
 }
-
-//change a lot of files

@@ -49,10 +49,10 @@ public class TicketDaoImpl implements TicketDao{
     }
 
     @Override
-    public List<Ticket> getAllTicketsForUser(User user) {
+    public List<Ticket> getAllTicketsForUser(int user_id) {
         List<Ticket> tickets = new ArrayList<>();
         ticketTable.forEach((k, tkt)-> {
-            if (user.getUser_id() == tkt.getUser().getUser_id()) {
+            if (user_id == tkt.getUser().getUser_id()) {
                 tickets.add(tkt);
             }
         });
@@ -60,7 +60,7 @@ public class TicketDaoImpl implements TicketDao{
     }
 
     @Override
-    public Ticket saveTicket(Ticket ticket) {
+    public Ticket updateTicketStatus(Ticket ticket) {
         ticketTable.put(ticket.getId(), ticket);
         return ticket;
     }

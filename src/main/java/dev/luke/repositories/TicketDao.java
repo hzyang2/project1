@@ -15,7 +15,7 @@ public interface TicketDao {
 
     List<Ticket> getPendingTickets();
 
-    List<Ticket> getAllTicketsForUser(User user);
+    List<Ticket> getAllTicketsForUser(int user_id);
 
-    Ticket saveTicket(Ticket ticket);
+    Ticket updateTicketStatus(Ticket ticket);
 }

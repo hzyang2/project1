@@ -80,11 +80,11 @@ public class TicketDaoPostgres implements TicketDao{
     }
 
     @Override
-    public List<Ticket> getAllTicketsForUser(User user) {
+    public List<Ticket> getAllTicketsForUser(int user_id) {
         try (Connection connection = ConnectionFactory.getConnection()) {
             String sql = "select * from tickets where user_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setInt(1, user.getUser_id());
+            ps.setInt(1, user_id);
 
             List<Ticket> ticketList = new ArrayList<>();
             ResultSet rs = ps.executeQuery();
@@ -133,7 +133,7 @@ public class TicketDaoPostgres implements TicketDao{
     }
 
     @Override
-    public Ticket saveTicket (Ticket ticket){
+    public Ticket updateTicketStatus(Ticket ticket){
         try (Connection connection = ConnectionFactory.getConnection()) {
             String sql = "update tickets set status = ? where id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);

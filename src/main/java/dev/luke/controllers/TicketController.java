@@ -5,7 +5,6 @@ import dev.luke.driver.Driver;
 import dev.luke.entities.Ticket;
 import dev.luke.entities.User;
 import io.javalin.http.Handler;
-
 import java.util.List;
 
 public class TicketController {
@@ -20,12 +19,12 @@ public class TicketController {
     };
 
     public Handler getUserByEmail = (ctx) ->{
-        String JSON = ctx.body();
+        String email = ctx.pathParam("email");//This will take what value was in the {email} template of the URL path defined in Driver.java.
+        User updateUser = Driver.ticketService.getUserByEmail(email);
         Gson gson = new Gson();
-        User user = gson.fromJson(JSON, User.class);
-        User updateUser = Driver.ticketService.getUserByEmail(user.getEmail());
         String json = gson.toJson(updateUser);
         ctx.result(json);
+
     };
 
     public Handler addNewTicket = (ctx) ->{
@@ -38,33 +37,25 @@ public class TicketController {
         ctx.result(ticketJson);
     };
     public Handler getPendingTickets = (ctx) ->{
-        String JSON = ctx.body();
         Gson gson = new Gson();
-        User user = gson.fromJson(JSON, User.class);
-        Ticket ticket = gson.fromJson(JSON, Ticket.class);
-        List<Ticket> getTicket = Driver.ticketService.getTicketsByStatus(ticket.getStatus(), user);
-        String json = gson.toJson(getTicket);
+        List<Ticket> pendingTickets = Driver.ticketService.getPendingTickets();
+        String json = gson.toJson(pendingTickets);
         ctx.result(json);
     };
 
     public Handler getAllTicketsForUser = (ctx) ->{
-        String JSON = ctx.body();
+        int userId = Integer.parseInt(ctx.pathParam("userId"));
+        List<Ticket> tickets = Driver.ticketService.getAllTicketsForUser(userId);
         Gson gson = new Gson();
-        User user = gson.fromJson(JSON, User.class);
-        Ticket ticket = gson.fromJson(JSON, Ticket.class);
-        List<Ticket> getTicket = Driver.ticketService.getTicketsByStatus(ticket.getStatus(), user);
-        String json = gson.toJson(getTicket);
+        String json = gson.toJson(tickets);
         ctx.result(json);
     };
 
-    public Handler saveTicket = (ctx) ->{
-        int id = Integer.parseInt(ctx.pathParam("id"));//This will take what value was in the {id} and turn it into an int for us to use
-        String status = "";
-        User user = null;
-        List<Ticket> ticket = Driver.ticketService.getTicketsByStatus(status, user);
+    public Handler updateTicketStatus = (ctx) ->{
+        String ticketJSON = ctx.body();
         Gson gson = new Gson();
-        String json = gson.toJson(ticket);
-        ctx.result(json);
+        Ticket ticket = gson.fromJson(ticketJSON, Ticket.class);
+        Driver.ticketService.updateTicketStatus(ticket);
+        ctx.status(204); //This is a status code that will tell us how things went
     };
-
 }
