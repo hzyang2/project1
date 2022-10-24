@@ -1,5 +1,4 @@
 package dev.luke.controllers;
-
 import com.google.gson.Gson;
 import dev.luke.driver.Driver;
 import dev.luke.entities.Ticket;
@@ -18,15 +17,6 @@ public class TicketController {
         ctx.result(userJason);
     };
 
-    public Handler getUserByEmail = (ctx) ->{
-        String email = ctx.pathParam("email");//This will take what value was in the {email} template of the URL path defined in Driver.java.
-        User updateUser = Driver.ticketService.getUserByEmail(email);
-        Gson gson = new Gson();
-        String json = gson.toJson(updateUser);
-        ctx.result(json);
-
-    };
-
     public Handler addNewTicket = (ctx) ->{
         String json = ctx.body();
         Gson gson = new Gson();
@@ -36,6 +26,16 @@ public class TicketController {
         ctx.status(201); //This is a status code that will tell us how things went
         ctx.result(ticketJson);
     };
+
+    public Handler getUserByEmail = (ctx) ->{
+        String email = ctx.pathParam("email");//This will take what value was in the {email} template of the URL path defined in Driver.java.
+        User updateUser = Driver.ticketService.getUserByEmail(email);
+        Gson gson = new Gson();
+        String json = gson.toJson(updateUser);
+        ctx.result(json);
+
+    };
+
     public Handler getPendingTickets = (ctx) ->{
         Gson gson = new Gson();
         List<Ticket> pendingTickets = Driver.ticketService.getPendingTickets();
