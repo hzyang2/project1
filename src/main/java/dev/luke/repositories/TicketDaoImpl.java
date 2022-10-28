@@ -1,5 +1,4 @@
 package dev.luke.repositories;
-
 import dev.luke.entities.Ticket;
 import dev.luke.entities.User;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ public class TicketDaoImpl implements TicketDao{
     private Map<String, User> userTable = new HashMap();
 
     @Override
-    public User addNewUser(User user) {
+    public User registerUser(User user) {
         user.setUser_id(idCount);
         idCount++;
         userTable.put(user.getEmail(), user);
@@ -32,6 +31,11 @@ public class TicketDaoImpl implements TicketDao{
         idCount++;
         ticketTable.put(ticket.getId(), ticket);
         return ticket;
+    }
+
+    @Override
+    public Ticket getTicketById(int ticket_id) {
+        return null;
     }
 
     /**
@@ -63,6 +67,11 @@ public class TicketDaoImpl implements TicketDao{
     public Ticket updateTicketStatus(Ticket ticket) {
         ticketTable.put(ticket.getId(), ticket);
         return ticket;
+    }
+
+    @Override
+    public User logIn(User user) {
+        return user;
     }
 }
 

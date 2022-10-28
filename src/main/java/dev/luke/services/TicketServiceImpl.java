@@ -13,9 +13,7 @@ public class TicketServiceImpl implements TicketService{
     }
 
     @Override
-    public User addNewUser(User user) {
-        return ticketDao.addNewUser(user);
-    }
+    public User registerUser(User user) { return ticketDao.registerUser(user); }
 
     @Override
     public User getUserByEmail(String email) {
@@ -33,6 +31,9 @@ public class TicketServiceImpl implements TicketService{
     }
 
     @Override
+    public Ticket getTicketById(int ticket_id) { return ticketDao.getTicketById(ticket_id); }
+
+    @Override
     public List<Ticket> getAllTicketsForUser(int user_id) {
         return ticketDao.getAllTicketsForUser(user_id);
     }
@@ -40,5 +41,10 @@ public class TicketServiceImpl implements TicketService{
     @Override
     public void updateTicketStatus(Ticket ticket) {
         ticketDao.updateTicketStatus(ticket);
+    }
+
+    @Override
+    public User logIn(User user) {
+        return ticketDao.logIn(user);
     }
 }

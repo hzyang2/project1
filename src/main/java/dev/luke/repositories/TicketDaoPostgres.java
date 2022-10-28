@@ -1,5 +1,4 @@
 package dev.luke.repositories;
-
 import dev.luke.entities.Ticket;
 import dev.luke.entities.User;
 import dev.luke.util.ConnectionFactory;
@@ -9,20 +8,27 @@ import java.util.List;
 
 public class TicketDaoPostgres implements TicketDao{
     @Override
-    public User addNewUser(User user) {
+    public User registerUser(User user) {
+        User searchUser = getUserByEmail(user.getEmail());
+        if(searchUser != null){
+            return null;
+        }
         try(Connection connection = ConnectionFactory.getConnection()){
             String sql = "insert into users values(default, ?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, user.getEmail());
-            preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setString(3, user.getRole());
+            //Three possible outcomes
+            // 1)no rows return (typical): register the user
+            // 2)password matches (user may have clicked Send twice): don't add another row, but populate user_id
+            // 3)password mismatch
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getRole());
 
-            //execute is used for create, executeQuery for selecting, executeUpdate for updating.
-            preparedStatement.execute();
+            ps.execute();
 
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-            resultSet.next();
-            int generatedKey = resultSet.getInt("user_id");
+            ResultSet rs = ps.getGeneratedKeys();
+            rs.next();
+            int generatedKey = rs.getInt("user_id");
             user.setUser_id(generatedKey);
             return user;
         }
@@ -36,22 +42,48 @@ public class TicketDaoPostgres implements TicketDao{
     public User getUserByEmail(String email) {
         try (Connection connection = ConnectionFactory.getConnection()) {
             String sql = "select * from users where email = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, email);
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, email);
 
-            ResultSet rs = preparedStatement.executeQuery();
-            rs.next();
-            User user = new User();
-            user.setUser_id(rs.getInt("user_id"));
-            user.setEmail(rs.getString("email"));
-            user.setPassword(rs.getString("password"));
-            user.setRole(rs.getString("role"));
-            user.setEmail(email);
-            return user;
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUser_id(rs.getInt("user_id"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setRole(rs.getString("role"));
+                user.setEmail(email);
+                return user;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+        return null;
+    }
+
+    @Override
+    public Ticket getTicketById(int ticket_id) {
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sql = "select * from tickets where id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, ticket_id);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Ticket ticket = new Ticket();
+                ticket.setId(rs.getInt("id"));
+                User user = new User();
+                user.setUser_id(rs.getInt("user_id"));
+                ticket.setUser(user);
+                ticket.setAmount(rs.getDouble("amount"));
+                ticket.setDescription(rs.getString("description"));
+                ticket.setStatus(rs.getString("status"));
+                return ticket;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -90,6 +122,10 @@ public class TicketDaoPostgres implements TicketDao{
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Ticket ticket = new Ticket();
+                ticket.setId(rs.getInt("id"));
+                User user = new User();
+                user.setUser_id(rs.getInt("user_id"));
+                ticket.setUser(user);
                 ticket.setAmount(rs.getDouble("amount"));
                 ticket.setDescription(rs.getString("description"));
                 ticket.setStatus(rs.getString("status"));
@@ -147,5 +183,23 @@ public class TicketDaoPostgres implements TicketDao{
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public User logIn(User user){
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            String sql = "select user_id, password from users where email = ? ";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, user.getEmail());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next() && user.getPassword().equals(rs.getString("password"))) {
+                user.setUser_id(rs.getInt("user_id"));
+            } else {
+                user = null; //This should be handled in client logic as "email is already in use".
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return user;
     }
 }

@@ -8,7 +8,32 @@ public class User {
 
     public Boolean isAuthenticated = false;
 
+    private String authorization_secret = "";
+
     public User() {}
+
+    public User(int user_id, String email, String password, String role) {
+        this.user_id = user_id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public Boolean getAuthenticated() {
+        return isAuthenticated;
+    }
+
+    public void setAuthenticated(Boolean authenticated) {
+        isAuthenticated = authenticated;
+    }
+
+    public boolean isAuthorizedManager() {
+        return this.authorization_secret.equals("mgr");
+    }
+
+    public void setAuthorization_secret(String authorization_secret) {
+        this.authorization_secret = authorization_secret;
+    }
 
     public User(String email, String password, String role) {
         this.email = email;
@@ -53,7 +78,6 @@ public class User {
         return "User{" +
                 "user_id=" + user_id +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 '}';
     }

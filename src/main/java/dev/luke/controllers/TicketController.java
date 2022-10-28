@@ -7,26 +7,53 @@ import io.javalin.http.Handler;
 import java.util.List;
 
 public class TicketController {
-    public Handler addNewUser = (ctx) ->{
+    private static final String mgrSecret = "mgr";
+
+    public Handler register = (ctx) ->{
         String json = ctx.body();
         Gson gson = new Gson();
         User user = gson.fromJson(json, User.class);
-        User addNewUser = Driver.ticketService.addNewUser(user);
-        String userJason = gson.toJson(addNewUser);
-        ctx.status(201); //This is a status code that will tell us how things went
-        ctx.result(userJason);
+        String role = user.isAuthorizedManager() ? "Manager" : "Employee";
+        user.setRole(role);
+        User newUser = Driver.ticketService.registerUser(user);
+        if(newUser == null){
+            ctx.status(409); //This status code is for conflict.
+            ctx.result("Email is already in use.");
+        }else {
+            //DON:T EXPOSE SENSITIVE INFO
+            newUser.setAuthorization_secret("");
+            newUser.setPassword("");
+            String userJason = gson.toJson(newUser);
+            ctx.status(201); //This is a status code that will tell us how things went
+            ctx.result(userJason);
+        }
     };
 
+    static final int NotAcceptable = 406;
     public Handler addNewTicket = (ctx) ->{
         String json = ctx.body();
         Gson gson = new Gson();
         Ticket ticket = gson.fromJson(json, Ticket.class);
-        Ticket addNewTicket = Driver.ticketService.addNewTicket(ticket);
-        String ticketJson = gson.toJson(addNewTicket);
-        ctx.status(201); //This is a status code that will tell us how things went
-        ctx.result(ticketJson);
+        if(ticket.getDescription() == null ||
+           ticket.getDescription().equals("") || ticket.getAmount() == 0.0){
+            ctx.status(NotAcceptable);
+            ctx.result("Your amount or description is missing.");
+        }else {
+            Ticket newTicket = Driver.ticketService.addNewTicket(ticket);
+            String ticketJson = gson.toJson(newTicket);
+            ctx.status(201); //This is a status code that will tell us how things went
+            ctx.result(ticketJson);
+        }
     };
 
+    public Handler getTicketById = (ctx) ->{
+        int id = Integer.parseInt(ctx.pathParam("id"));//This will take what value was in the {email} template of the URL path defined in Driver.java.
+        Ticket ticket = Driver.ticketService.getTicketById(id);
+        Gson gson = new Gson();
+        String json = gson.toJson(ticket);
+        ctx.result(json);
+
+    };
     public Handler getUserByEmail = (ctx) ->{
         String email = ctx.pathParam("email");//This will take what value was in the {email} template of the URL path defined in Driver.java.
         User updateUser = Driver.ticketService.getUserByEmail(email);
@@ -36,11 +63,19 @@ public class TicketController {
 
     };
 
+    static final int notAuthorized = 401;
     public Handler getPendingTickets = (ctx) ->{
+        String json = ctx.body();
         Gson gson = new Gson();
-        List<Ticket> pendingTickets = Driver.ticketService.getPendingTickets();
-        String json = gson.toJson(pendingTickets);
-        ctx.result(json);
+        User user = gson.fromJson(json, User.class);
+        if(user.isAuthorizedManager()) {
+            List<Ticket> pendingTickets = Driver.ticketService.getPendingTickets();
+            String json1 = gson.toJson(pendingTickets);
+            ctx.result(json1);
+        }else{
+            ctx.status(notAuthorized);
+            ctx.result("You are not authorized.");
+        }
     };
 
     public Handler getAllTicketsForUser = (ctx) ->{
@@ -55,7 +90,28 @@ public class TicketController {
         String ticketJSON = ctx.body();
         Gson gson = new Gson();
         Ticket ticket = gson.fromJson(ticketJSON, Ticket.class);
-        Driver.ticketService.updateTicketStatus(ticket);
-        ctx.status(204); //This is a status code that will tell us how things went
+        User user = ticket.getUser();
+        if(user.isAuthorizedManager()){
+            Driver.ticketService.updateTicketStatus(ticket);
+            ctx.status(204); //This is a status code that will tell us how things went
+        }else{
+            ctx.status(notAuthorized);
+            ctx.result("You are not authorized.");
+        }
+    };
+
+    public Handler logIn = (ctx) ->{
+        String loginjson = ctx.body();
+        Gson gson = new Gson();
+        User user = gson.fromJson(loginjson, User.class);
+        User newUser = Driver.ticketService.logIn(user);
+        if(newUser == null){
+            ctx.status(409); //This status code is for conflict.
+            ctx.result("Your password is wrong.");
+        }else {
+            String userJason = gson.toJson(newUser);
+            ctx.status(201); //This is a status code that will tell us how things went
+            ctx.result(userJason);
+        }
     };
 }
